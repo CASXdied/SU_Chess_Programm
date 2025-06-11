@@ -5,3 +5,4 @@ The tournament is created using command 3. ‘Select players by surname’. To f
 Command 4. Simulate single round forms one pair between two players. 
 Command 5. is not working yet, but there are plans to refine the function that creates a file with the top record holders by rating (1500, 1600, etc.). 
 Command 6. (Exit) - exits the program, saving all changes. 
+There are some unused features inside, but the project is functional.

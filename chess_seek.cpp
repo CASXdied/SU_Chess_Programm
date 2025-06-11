@@ -1,4 +1,5 @@
-﻿#define NOMINMAX // Для #include <windows.h>
+//Completed by Alexander, a student at Satbaeyv University.
+#define NOMINMAX // Для #include <windows.h>
 #define _CRT_SECURE_NO_WARNINGS // Для отключения предупреждений безопасности
 #include <iostream>
 #include <vector>
@@ -15,7 +16,7 @@
 #include <locale>
 #include <codecvt>
 #include <chrono>
-#include <filesystem> // Убедитесь, что используется C++17
+#include <filesystem> // !!! Использовать C++17
 #include <ctime>
 #include <set>
 #include <unordered_map>
@@ -141,9 +142,9 @@ public:
         }
     }
     double getPoints() const { return wins + draws * 0.5; }
-    void addWin() { tournamentWins++; }         // Было: wins++; tournamentWins++;
-    void addDraw() { tournamentDraws++; }       // Было: draws++; tournamentDraws++;
-    void addDefeat() { tournamentDefeats++; }   // Было: defeats++; tournamentDefeats++;
+    void addWin() { tournamentWins++; }
+    void addDraw() { tournamentDraws++; }
+    void addDefeat() { tournamentDefeats++; }
     void setActive(bool isActive) { active = isActive; }
     bool isActive() const { return active; }
     void resetpoints()
@@ -172,7 +173,7 @@ public:
 
     int getTotalRounds() const { return wins + draws + defeats; }
 
-    void updateBerger() // Убрать параметр opponents
+    void updateBerger()
     {
         double total = 0.0;
         for (const auto& match : matchHistory)
@@ -324,7 +325,7 @@ class TournamentManager
     const vector<unique_ptr<ChessPlayer>>& allPlayers; // Ссылка на основной список игроков
     vector<ChessPlayer*> participants;
     map<pair<string, string>, bool> previousPairs;
-    int roundNumber = 0;  // Было ошибочное tournament.roundNumber
+    int roundNumber = 0;
     struct TempResult
     {
         ChessPlayer* white;
@@ -351,9 +352,10 @@ public:
         return candidate;
     }
 
-    vector<ChessPlayer*> fixedOrderPlayers; // Фиксированный порядок для Round-Robin
+    vector<ChessPlayer*> fixedOrderPlayers;
 
-    bool canPlayTogether(ChessPlayer* a, ChessPlayer* b) {
+    bool canPlayTogether(ChessPlayer* a, ChessPlayer* b) 
+    {
         if (a == b || a == nullptr || b == nullptr)
             return false;
         if (a->hasPlayedWith(b->surname))
@@ -361,7 +363,8 @@ public:
         return true;
     }
 
-    double pairWeight(ChessPlayer* a, ChessPlayer* b) {
+    double pairWeight(ChessPlayer* a, ChessPlayer* b)
+    {
         double weight = 0.0;
 
         // Приоритет 1: Минимизация разницы очков
@@ -391,40 +394,44 @@ public:
         return weight;
     }
 
-    void assignColors(ChessPlayer* a, ChessPlayer* b) {
+    void assignColors(ChessPlayer* a, ChessPlayer* b) 
+    {
         // Рассчитываем оба варианта расстановки цветов
         int colorWeight1 = (a->colorBalance <= 0 ? 100 : 0) + (b->colorBalance >= 0 ? 100 : 0);
         int colorWeight2 = (a->colorBalance >= 0 ? 100 : 0) + (b->colorBalance <= 0 ? 100 : 0);
 
-        if (colorWeight1 >= colorWeight2) {
+        if (colorWeight1 >= colorWeight2) 
+        {
             a->colorBalance++;
             b->colorBalance--;
             a->lastColors.push_back(true);
             b->lastColors.push_back(false);
         }
-        else {
+        else 
+        {
             a->colorBalance--;
             b->colorBalance++;
             a->lastColors.push_back(false);
             b->lastColors.push_back(true);
         }
     }
-
-    // ChatGpt интегрировало с dutch.cpp 
     // Более чем работает, но сохранение пока не проверял
     // Пришлось ещё несколько раз править, в итоге была создана функция findGroupPairings. Но в целом - отлично
     bool findGroupPairings(vector<ChessPlayer*>& group, vector<pair<ChessPlayer*, ChessPlayer*>>& resultPairs, vector<bool>& used) {
         int n = group.size();
-        if (n % 2 != 0) return false; // Нечётное — невозможно
+        if (n % 2 != 0) 
+            return false; // Нечётное — невозможно
 
         // Базовый случай — все использованы
         bool allUsed = true;
         for (bool u : used) 
-            if (!u) 
-                 allUsed = false; break; 
+            if (!u)
+            {
+                allUsed = false; 
+                break;
+            }
         if (allUsed) 
             return true;
-
         for (size_t i = 0; i < n; ++i) 
         {
             if (used[i]) 
@@ -517,8 +524,8 @@ public:
         }
         else if (!downfloaters.empty())
         {
-            // Ошибка — кто-то остался непропарен при чётном числе
-            cerr << "❌ Ошибка: непропаренные игроки при чётном числе участников:" << endl;
+            // Ошибка — кто-то остался непропарен при чётном числе. Создано для логов.
+            cerr << "Ошибка: непропаренные игроки при чётном числе участников:" << endl;
             for (ChessPlayer* p : downfloaters)
                 cerr << "- " << p->surname << endl;
         }
@@ -643,8 +650,6 @@ private:
 
         double originalRating1 = p1->rating;
         double originalRating2 = p2->rating;
-
-        // revertMatchResult(p1, p2, result); Бред, удалить
 
         if (result == 1.0)
         {
@@ -942,7 +947,8 @@ void TournamentManager::reset()
         // Не сбрасываем hasReceivedBye здесь, только при создании нового турнира
     }
 }
-bool TournamentManager::tryFormPairs(const vector<ChessPlayer*>& available, vector<bool>& used, size_t start, vector<pair<size_t, size_t>>& currentPairs) {
+bool TournamentManager::tryFormPairs(const vector<ChessPlayer*>& available, vector<bool>& used, size_t start, vector<pair<size_t, size_t>>& currentPairs) 
+{
     if (start >= available.size())
         return true; // Все игроки распределены
 
@@ -1033,7 +1039,6 @@ void saveTournamentResults(const vector<ChessPlayer*>& players)
     date_ss << put_time(&tm, "%Y-%m-%d_%H-%M-%S");
     const string filename = results_dir + "/tournament_" + date_ss.str() + ".txt";
 
-
     // Сортируем игроков
     sort(sorted.begin(), sorted.end(), [](ChessPlayer* a, ChessPlayer* b)
         {
@@ -1080,7 +1085,8 @@ void saveTournamentResults(const vector<ChessPlayer*>& players)
         cerr << "Error saving tournament results!" << endl;
 }
 
-void displayInfo(const vector<unique_ptr<ChessPlayer>>& players) {
+void displayInfo(const vector<unique_ptr<ChessPlayer>>& players) 
+{
 #ifdef _WIN32
     // Настройка консоли для поддержки цветов и UTF-8
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
